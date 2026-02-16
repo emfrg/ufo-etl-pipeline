@@ -1,10 +1,16 @@
 # yaml-language-server: $schema=bundle_config_schema.json
 bundle:
-  name: DAB_tutorialbnu
+  name: ufo_sightings_etl
 
 workspace:
-  profile: asset-bundle-tutorial
+  profile: ufo-sightings
   # host: https://dbc-dc87ce1b-d1d3.cloud.databricks.com
+
+artifacts:
+  python_artifact:
+    type: whl
+    build: uv build
+    path: .
 
 include:
   - ./resources/*.yml

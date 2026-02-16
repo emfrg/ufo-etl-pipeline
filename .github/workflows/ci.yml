@@ -10,16 +10,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v4
 
       - name: Install Databricks CLI
         run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 
       - name: Configure Databricks auth
         run: |
-          echo "[asset-bundle-tutorial]" > ~/.databrickscfg
+          echo "[ufo-sightings]" > ~/.databrickscfg
           echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
           echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
 
@@ -27,14 +25,12 @@ jobs:
         run: databricks bundle validate
 
       - name: Install dependencies
-        run: |
-          pip install --upgrade wheel setuptools
-          pip install -e ".[local]"
+        run: uv sync
 
       - name: Deploy and run tests
         run: |
-          databricks bundle deploy -t dev
-          databricks bundle run -t dev test_job
+          uv run databricks bundle deploy -t dev
+          uv run databricks bundle run -t dev test_job
 
   deploy:
     runs-on: ubuntu-latest
@@ -42,16 +38,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - uses: astral-sh/setup-uv@v4
 
       - name: Install Databricks CLI
         run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 
       - name: Configure Databricks auth
         run: |
-          echo "[asset-bundle-tutorial]" > ~/.databrickscfg
+          echo "[ufo-sightings]" > ~/.databrickscfg
           echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
           echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
 
@@ -59,9 +53,9 @@ jobs:
         run: databricks bundle validate
 
       - name: Install dependencies
-        run: pip install -e ".[local]"
+        run: uv sync
 
       - name: Deploy and run ETL job
         run: |
-          databricks bundle deploy -t dev
-          databricks bundle run -t dev etl_job
+          uv run databricks bundle deploy -t dev
+          uv run databricks bundle run -t dev etl_job

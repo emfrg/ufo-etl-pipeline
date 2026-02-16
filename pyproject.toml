@@ -1,0 +1,21 @@
+[project]
+name = "my_package"
+version = "0.0.1"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+etl_job = "my_package.tasks.ufo_etl_job:entrypoint"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude = ["tests", "tests.*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = ["pytest", "coverage[toml]", "pytest-cov"]

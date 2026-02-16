@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from pyspark.sql import SparkSession
 
@@ -23,8 +24,7 @@ class Task(ABC):
             return spark
 
     def _prepare_logger(self):
-        log4j_logger = self.spark._jvm.org.apache.log4j  # noqa
-        return log4j_logger.LogManager.getLogger(self.__class__.__name__) 
+        return logging.getLogger(self.__class__.__name__)
 
     
     def read_table(self, path: str, frmt: str = "DELTA", opt: dict = {}):
