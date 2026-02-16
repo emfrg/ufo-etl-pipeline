@@ -1,0 +1,34 @@
+variables:
+  my_cluster_id:
+    description: The ID of an existing cluster.
+    default: <ADD YOUR CLUSTER ID>
+
+resources:
+    jobs:
+      etl_job:
+        tasks:
+          - task_key: "main"
+            existing_cluster_id: ${var.my_cluster_id}
+            python_wheel_task:
+              package_name: "my_package"
+              entry_point: "etl_job" # take a look at the setup.py entry_points section for details on how to define an entrypoint
+            libraries:
+            - whl: ../dist/*.whl
+          - task_key: "eda"
+            existing_cluster_id: ${var.my_cluster_id}
+            notebook_task:
+              notebook_path: ../notebooks/explorative_analysis.py
+              source: WORKSPACE
+            depends_on:
+              - task_key: "main"  
+
+      test_job:         
+        tasks:
+          - task_key: "main_notebook"
+            existing_cluster_id: ${var.my_cluster_id}
+            notebook_task:
+              notebook_path: ../notebooks/run_unit_test.py
+              source: WORKSPACE
+            libraries:
+            - pypi:
+                package: pytest

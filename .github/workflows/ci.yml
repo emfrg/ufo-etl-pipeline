@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Databricks CLI
+        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      - name: Configure Databricks auth
+        run: |
+          echo "[asset-bundle-tutorial]" > ~/.databrickscfg
+          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
+          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
+
+      - name: Validate bundle
+        run: databricks bundle validate
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade wheel setuptools
+          pip install -e ".[local]"
+
+      - name: Deploy and run tests
+        run: |
+          databricks bundle deploy -t dev
+          databricks bundle run -t dev test_job
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Databricks CLI
+        run: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      - name: Configure Databricks auth
+        run: |
+          echo "[asset-bundle-tutorial]" > ~/.databrickscfg
+          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
+          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
+
+      - name: Validate bundle
+        run: databricks bundle validate
+
+      - name: Install dependencies
+        run: pip install -e ".[local]"
+
+      - name: Deploy and run ETL job
+        run: |
+          databricks bundle deploy -t dev
+          databricks bundle run -t dev etl_job
