@@ -13,7 +13,10 @@ artifacts:
     path: .
 
 include:
-  - ./resources/*.yml
+  # Notebook mode (default — works on free trial and paid workspaces):
+  - ./resources/dev_jobs.yml
+  # Wheel mode (requires paid workspace with serverless environment support):
+  # - ./resources/dev_jobs_wheel.yml
 
 targets:
   # The 'dev' target, used for development purposes.

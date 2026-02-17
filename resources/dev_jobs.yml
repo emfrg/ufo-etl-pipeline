@@ -1,24 +1,20 @@
+# Notebook mode — works on free trial and paid workspaces.
+# For wheel mode (paid workspaces only), swap the include in databricks.yml.
+
 resources:
   jobs:
     etl_job:
       tasks:
         - task_key: "main"
-          python_wheel_task:
-            package_name: "my_package"
-            entry_point: "etl_job"
-          environment_key: default
+          notebook_task:
+            notebook_path: ../notebooks/run_etl_job.py
+            source: WORKSPACE
         - task_key: "eda"
           notebook_task:
             notebook_path: ../notebooks/explorative_analysis.py
             source: WORKSPACE
           depends_on:
             - task_key: "main"
-      environments:
-        - environment_key: default
-          spec:
-            client: "1"
-            dependencies:
-              - ../dist/*.whl
 
     test_job:
       tasks:

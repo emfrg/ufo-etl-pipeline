@@ -1,0 +1,38 @@
+# Wheel mode — for paid workspaces with serverless environment support.
+# To use this file, swap the include in databricks.yml (see instructions there).
+
+resources:
+  jobs:
+    etl_job:
+      tasks:
+        - task_key: "main"
+          python_wheel_task:
+            package_name: "my_package"
+            entry_point: "etl_job"
+          environment_key: default
+        - task_key: "eda"
+          notebook_task:
+            notebook_path: ../notebooks/explorative_analysis.py
+            source: WORKSPACE
+          depends_on:
+            - task_key: "main"
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+            dependencies:
+              - ../dist/*.whl
+
+    test_job:
+      tasks:
+        - task_key: "main_notebook"
+          notebook_task:
+            notebook_path: ../notebooks/run_unit_test.py
+            source: WORKSPACE
+          environment_key: default
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+            dependencies:
+              - pytest
